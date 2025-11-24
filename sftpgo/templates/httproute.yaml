@@ -1,0 +1,33 @@
+{{- if .Values.sftpgoUI.enabled }}
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-ui
+  {{- if .Values.sftpgoUI.route.labels }}
+  labels:
+    {{- toYaml .Values.sftpgoUI.route.labels | nindent 4 }}
+  {{- end }}
+  {{- if .Values.sftpgoUI.annotations }}
+  annotations:
+    {{- toYaml .Values.sftpgoUI.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+  - name: {{ .Values.sftpgoUI.parentRef.name }}
+    namespace: {{ .Values.sftpgoUI.parentRef.namespace }}
+    sectionName: {{ .Values.sftpgoUI.parentRef.sectionName }}
+  hostnames:
+  {{- range .Values.sftpgoUI.route.hostnames }}
+  - {{ . | quote }}
+  {{- end }}
+  rules:
+  {{- range .Values.sftpgoUI.route.paths }}
+  - matches:
+    - path:
+        type: {{ .type }}
+        value: {{ .value }}
+    backendRefs:
+    - name: {{ include "sftpgo.fullname" $ }}
+      port: {{ .service.port }}
+  {{- end }}
+{{- end }}
