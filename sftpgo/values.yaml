@@ -1,0 +1,101 @@
+secrets:
+  db: "k8s/dev/sftpgo/db"
+
+sftpgoUI:
+  enabled: true
+  parentRef:
+    name: istio-gateway
+    namespace: istio-system
+    sectionName: https
+  route:
+    hostnames:
+      - sftpgo.kubetron.site
+    paths:
+      - type: PathPrefix
+        value: /
+        service:
+          port: 80
+
+sftpgoTCP:
+  enabled: true
+  parentRef:
+    name: istio-gateway
+    namespace: istio-system
+    sectionName: sftp
+  route:
+    hostnames:
+      - sftpgo.kubetron.site
+    paths:
+      - type: PathPrefix
+        value: /
+        service:
+          port: 22
+
+sftpgo:
+  replicaCount: 1
+  sftpd:
+    enabled: true
+    port: 2022
+  httpd:
+    enabled: true
+    port: 8080
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name:
+
+  config:
+    sftpd:
+      max_auth_retries: 5
+
+  envVars:
+    - name: SFTPGO_DATA_PROVIDER__SSLMODE
+      value: "1"
+    - name: SFTPGO_DATA_PROVIDER__DRIVER
+      valueFrom:
+        secretKeyRef:
+          name: sftpgo-db-secret
+          key: dbProvider
+    - name: SFTPGO_DATA_PROVIDER__NAME
+      valueFrom:
+        secretKeyRef:
+          name: sftpgo-db-secret
+          key: dbName
+    - name: SFTPGO_DATA_PROVIDER__HOST
+      valueFrom:
+        secretKeyRef:
+          name: sftpgo-db-secret
+          key: dbHost
+    - name: SFTPGO_DATA_PROVIDER__PORT
+      valueFrom:
+        secretKeyRef:
+          name: sftpgo-db-secret
+          key: dbPort
+    - name: SFTPGO_DATA_PROVIDER__USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: sftpgo-db-secret
+          key: dbUsername
+    - name: SFTPGO_DATA_PROVIDER__PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: sftpgo-db-secret
+          key: dbPassword
+
+  volumes: []
+
+  volumeMounts: []
+
+  persistence:
+    enabled: true
+    pvc:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: "gp2"
+  ui:
+    ingress:
+      enabled: false

@@ -1,0 +1,10 @@
+apiVersion: v2
+type: application
+name: sftpgo
+version: 1.0.0
+sources:
+  - https://github.com/sftpgo/helm-chart
+dependencies:
+  - name: sftpgo
+    repository: oci://ghcr.io/sftpgo/helm-charts
+    version: 0.40.0
