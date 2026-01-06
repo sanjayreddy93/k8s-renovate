@@ -7,4 +7,4 @@ sources:
 dependencies:
   - name: sftpgo
     repository: oci://ghcr.io/sftpgo/helm-charts
-    version: 0.41.0
+    version: 0.42.0
